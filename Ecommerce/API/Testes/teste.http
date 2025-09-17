@@ -1,8 +1,15 @@
 ### Raiz da aplicação
-GET http://localhost:5106
+GET http://localhost:5190
 
-### Testar a segunda funcionalidade
-GET http://localhost:5106/endereco
+### Listar os produtos
+GET http://localhost:5190/api/produto/listar
 
-### Testar a funcionalidade do POST
-POST http://localhost:5106/endereco
+### Cadastrar produto
+POST http://localhost:5190/api/produto/cadastrar
+Content-Type: application/json
+
+{
+    "nome" : "Mouse",
+    "quantidade" : 123,
+    "preco" : 57.75,
+}
