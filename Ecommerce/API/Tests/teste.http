@@ -1,0 +1,15 @@
+### Raiz da aplicação
+GET http://localhost:5190
+
+### Listar os produtos
+GET http://localhost:5190/api/produto/listar
+
+### Cadastrar produto
+POST http://localhost:5190/api/produto/cadastrar
+Content-Type: application/json
+
+{
+    "nome" : "Mouse",
+    "quantidade" : 123,
+    "preco" : 57.75,
+}

@@ -1,7 +1,9 @@
 ﻿//Passos para resolver o bubble sort
-//1 - Criar um array(vetor) para receber 100 posições
-//2 - Criar um laço dde repetição para percorrer o vetor
-//3 - Preencher cada posição com um valor aleatório
+//1 - Criar um vetor para receber 100 posições
+//2 - Criar um laço de repetição para percorrer
+//o vetor
+//3 - Preencher cada posição com um valor 
+//aleatório
 //4 - Imprimir o vetor com valores aleatórios
 
 int tamanho = 100;
@@ -20,8 +22,9 @@ for (int i = 0; i < tamanho; i++)
 
 //5 - Percorrer o vetor com valores aleatórios
 //6 - Comparar a posição atual com a próxima
-//7 - Se a posição atual for maior, inverte os valores
-//8 - Imprimir o vetor com valores aleatórios
+//7 - Se a posição atual for maior, inverte 
+//os valores
+//8 - Imprimir o vetor com valores ordenados
 
 bool troca = false;
 do
@@ -39,7 +42,7 @@ do
             vetor[i + 1] = aux;
         }
     }
-} while (troca == true);
+} while (troca);
 
 Console.WriteLine("\n");
 for (int i = 0; i < tamanho; i++)
@@ -47,6 +50,7 @@ for (int i = 0; i < tamanho; i++)
     Console.Write(vetor[i] + " ");
 }
 
-//9 - Percorrer o vetor com os valores aleatórios
-//10 - Percorrer o vetor até ordernar ele todo
-//11 - Ou percorrer o vetor de forma decrescente até ordenar todo vetor
+//9 - Percorrer o vetor com valores aleatórios
+//10 - Percorrer o vetor até ordenar ele todo
+//11 - Ou percorrer o vetor de forma decrescente até
+//ordenar todo o vetor
