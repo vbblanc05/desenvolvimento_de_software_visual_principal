@@ -4,6 +4,9 @@ GET http://localhost:5190
 ### Listar os produtos
 GET http://localhost:5190/api/produto/listar
 
+### Buscar os produtos
+GET http://localhost:5190/api/produto/buscar/Mouse
+
 ### Cadastrar produto
 POST http://localhost:5190/api/produto/cadastrar
 Content-Type: application/json
@@ -11,5 +14,5 @@ Content-Type: application/json
 {
     "nome" : "Mouse",
     "quantidade" : 123,
-    "preco" : 57.75,
+    "preco" : 57.75
 }

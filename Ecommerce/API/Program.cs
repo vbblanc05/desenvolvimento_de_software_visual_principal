@@ -1,4 +1,5 @@
 using API.Models;
+using Microsoft.AspNetCore.Mvc;
 
 Console.Clear();
 var builder = WebApplication.CreateBuilder(args);
@@ -25,24 +26,72 @@ List<Produto> produtos = new List<Produto>
 
 // Métodos HTTP:
 // GET    - Recupera dados do servidor
-// POST   - Envia dados para criar um recurso
+// POST   - Envia/Cadastrar dados para criar um novo recurso
 // PUT    - Atualiza um recurso existente
 // DELETE - Remove um recurso
 // PATCH  - Atualiza parcialmente um recurso
+
+// Os códigos de status HTTP são divididos em cinco classes:
+// 1xx (Informativa)
+// 100 Continue: O servidor recebeu a solicitação inicial e o cliente deve continuar a enviar o restante da requisição. 
+// 2xx (Sucesso)
+// 200 OK: A requisição foi bem-sucedida. É o código de status mais comum para uma resposta bem-sucedida.
+// 201 Created: A requisição foi bem-sucedida e um novo recurso foi criado.
+// 204 No Content: A requisição foi bem-sucedida, mas não há conteúdo para ser enviado na resposta. 
+// 3xx (Redirecionamento)
+// 301 Moved Permanently: O recurso solicitado foi permanentemente movido para uma nova URL.
+// 302 Found: O recurso solicitado foi temporariamente movido para uma nova URL. 
+// 4xx (Erro do Cliente)
+// 400 Bad Request: A requisição do cliente foi malformada ou inválida.
+// 401 Unauthorized: A requisição requer autenticação. O cliente precisa fornecer credenciais válidas.
+// 403 Forbidden: O cliente não tem permissão para acessar o recurso, mesmo que a autenticação tenha sido fornecida.
+// 404 Not Found: O servidor não conseguiu encontrar o recurso solicitado.
+// 429 Too Many Requests: O cliente enviou muitas solicitações em um determinado período de tempo. 
+// 5xx (Erro do Servidor)
+// 500 Internal Server Error: O servidor encontrou uma condição inesperada que o impediu de atender à requisição.
+// 503 Service Unavailable: O servidor não está pronto para lidar com a requisição, geralmente devido a uma sobrecarga ou manutenção.
+// 504 Gateway Timeout: O servidor, que estava atuando como um gateway, não recebeu uma resposta dentro do tempo limite. 
 
 app.MapGet("/", () => "API de Produtos");
 
 //GET: /api/produto/listar
 app.MapGet("/api/produto/listar", () =>
 {
-    return produtos;
+    //Validar a lista de produtos para saber se existe algo dentro
+    if (produtos.Any())
+    {
+        return Results.Ok(produtos);
+    }
+
+    return Results.NotFound("Lista vazia!");
+});
+
+//GET: /api/produto/buscar/produto_buscado
+app.MapGet("/api/produto/buscar/{nome}", (string nome) =>
+{
+    //Expressão lambda
+    Produto? resultado = produtos.FirstOrDefault(x => x.Nome == nome);
+    if (resultado is null)
+    {
+        return Results.NotFound("Produto não encontrado!");
+    }
+    return Results.Ok(resultado);
 });
 
 //POST: /api/produto/cadastrar
 app.MapPost("/api/produto/cadastrar",
-    (Produto produto) =>
+    ([FromBody] Produto produto) =>
 {
+    //Não permitir o cadastro de um produto com mesmo nome
+    foreach (Produto produtoCadastrado in produtos)
+    {
+        if (produtoCadastrado.Nome == produto.Nome)
+        {
+            return Results.Conflict("Produto já cadastrado!");
+        }
+    }
     produtos.Add(produto);
+    return Results.Created("", produto);
 });
 
 
