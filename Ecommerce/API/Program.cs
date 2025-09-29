@@ -94,5 +94,22 @@ app.MapPost("/api/produto/cadastrar",
     return Results.Created("", produto);
 });
 
+//DELETE: /api/produto/alterar/id
+app.MapPatch("/api/produto/alterar/{id}",
+    ([FromRoute] string id,
+    [FromBody] Produto produtoAlterado) =>
+{
+    Produto? resultado = produtos.FirstOrDefault
+        (produtoCadastrado => produtoCadastrado.Id == id);
+    if (resultado is null)
+    {
+        return Results.NotFound("Produto não encontrado!");
+    }
+    resultado.Nome = produtoAlterado.Nome;
+    resultado.Quantidade = produtoAlterado.Quantidade;
+    resultado.Preco = produtoAlterado.Preco;
+    return Results.Ok(resultado);
+});
 
+//Implementar a remoção e atualização do produto
 app.Run();

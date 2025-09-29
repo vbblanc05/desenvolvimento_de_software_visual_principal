@@ -16,3 +16,16 @@ Content-Type: application/json
     "quantidade" : 123,
     "preco" : 57.75
 }
+
+###Remover produto por id
+DELETE http://localhost:5190/api/produto/deletar/da2f5d4b-7776-4182-9ede-9a7ffb32da75
+
+### Alterar produto
+PATCH http://localhost:5190/api/produto/deletar/3cba2ec9-ad20-45ed-bcd5-6a53551375c0
+Content-Type: application/json
+
+{
+    "nome" : "Mouse",
+    "quantidade" : 123,
+    "preco" : 57.75
+}
