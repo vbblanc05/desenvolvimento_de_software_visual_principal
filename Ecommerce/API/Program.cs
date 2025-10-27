@@ -1,8 +1,9 @@
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
 
-Console.Clear();
+// Console.Clear();
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<AppDataContext>();
 var app = builder.Build();
 
 //Lista de produtos fakes
@@ -23,54 +24,53 @@ List<Produto> produtos = new List<Produto>
 //Funcionalidade - Requisições
 // - URL/Caminho/Endereço
 // - Um método HTTP
+// - Dados: rota (URL) e corpo (opcional)
+
+//Respostas
+// - Código de status HTTP
+// - Corpo/Dados
 
 // Métodos HTTP:
-// GET    - Recupera dados do servidor
-// POST   - Envia/Cadastrar dados para criar um novo recurso
+// GET    - Recuperar/Enviar dados da sua API/aplicação
+// POST   - Enviar/Cadastrar dados para criar um novo recurso
 // PUT    - Atualiza um recurso existente
 // DELETE - Remove um recurso
 // PATCH  - Atualiza parcialmente um recurso
 
-// Os códigos de status HTTP são divididos em cinco classes:
-// 1xx (Informativa)
-// 100 Continue: O servidor recebeu a solicitação inicial e o cliente deve continuar a enviar o restante da requisição. 
+//Códigos de Status HTTP
 // 2xx (Sucesso)
-// 200 OK: A requisição foi bem-sucedida. É o código de status mais comum para uma resposta bem-sucedida.
-// 201 Created: A requisição foi bem-sucedida e um novo recurso foi criado.
-// 204 No Content: A requisição foi bem-sucedida, mas não há conteúdo para ser enviado na resposta. 
-// 3xx (Redirecionamento)
-// 301 Moved Permanently: O recurso solicitado foi permanentemente movido para uma nova URL.
-// 302 Found: O recurso solicitado foi temporariamente movido para uma nova URL. 
+// 200 OK: A solicitação foi bem-sucedida e o servidor retornou a resposta esperada.
+// 201 Created: A solicitação foi bem-sucedida e um novo recurso foi criado como resultado (geralmente usado em POST).
+// 204 No Content: A solicitação foi bem-sucedida, mas não há conteúdo para retornar (geralmente em respostas de DELETE ou PUT sem necessidade de retornar dados).
 // 4xx (Erro do Cliente)
-// 400 Bad Request: A requisição do cliente foi malformada ou inválida.
-// 401 Unauthorized: A requisição requer autenticação. O cliente precisa fornecer credenciais válidas.
-// 403 Forbidden: O cliente não tem permissão para acessar o recurso, mesmo que a autenticação tenha sido fornecida.
-// 404 Not Found: O servidor não conseguiu encontrar o recurso solicitado.
-// 429 Too Many Requests: O cliente enviou muitas solicitações em um determinado período de tempo. 
-// 5xx (Erro do Servidor)
-// 500 Internal Server Error: O servidor encontrou uma condição inesperada que o impediu de atender à requisição.
-// 503 Service Unavailable: O servidor não está pronto para lidar com a requisição, geralmente devido a uma sobrecarga ou manutenção.
-// 504 Gateway Timeout: O servidor, que estava atuando como um gateway, não recebeu uma resposta dentro do tempo limite. 
+// 400 Bad Request: A solicitação é inválida ou malformada; o servidor não conseguiu entendê-la.
+// 401 Unauthorized: O cliente não tem permissão para acessar o recurso, geralmente porque precisa autenticar-se.
+// 404 Not Found: O recurso solicitado não foi encontrado no servidor.
+// 409 Conflict: A solicitação não pôde ser processada devido a um conflito, geralmente relacionado a dados (como tentar criar um recurso com o mesmo identificador que outro já existe).
 
 app.MapGet("/", () => "API de Produtos");
 
 //GET: /api/produto/listar
-app.MapGet("/api/produto/listar", () =>
+app.MapGet("/api/produto/listar",
+    ([FromServices] AppDataContext ctx) =>
 {
-    //Validar a lista de produtos para saber se existe algo dentro
-    if (produtos.Any())
+    //Validar a lista de produtos para saber 
+    //se existe algo dentro
+    if (ctx.Produtos.Any())
     {
-        return Results.Ok(produtos);
+        return Results.Ok(ctx.Produtos.ToList());
     }
-
     return Results.NotFound("Lista vazia!");
 });
 
-//GET: /api/produto/buscar/produto_buscado
-app.MapGet("/api/produto/buscar/{nome}", (string nome) =>
+//GET: /api/produto/buscar/nome_do_produto
+app.MapGet("/api/produto/buscar/{nome}",
+    ([FromRoute] string nome,
+    [FromServices] AppDataContext ctx) =>
 {
     //Expressão lambda
-    Produto? resultado = produtos.FirstOrDefault(x => x.Nome == nome);
+    Produto? resultado =
+        ctx.Produtos.FirstOrDefault(x => x.Nome == nome);
     if (resultado is null)
     {
         return Results.NotFound("Produto não encontrado!");
@@ -80,41 +80,44 @@ app.MapGet("/api/produto/buscar/{nome}", (string nome) =>
 
 //POST: /api/produto/cadastrar
 app.MapPost("/api/produto/cadastrar",
-    ([FromBody] Produto produto) =>
+    ([FromBody] Produto produto,
+    [FromServices] AppDataContext ctx) =>
 {
-    //Não permitir o cadastro de um produto com mesmo nome
-    foreach (Produto produtoCadastrado in produtos)
+    //Não permitir o cadastro de um produto
+    //com o mesmo nome
+    Produto? resultado =
+        ctx.Produtos.FirstOrDefault(x => x.Nome == produto.Nome);
+    if (resultado is not null)
     {
-        if (produtoCadastrado.Nome == produto.Nome)
-        {
-            return Results.Conflict("Produto já cadastrado!");
-        }
+        return Results.Conflict("Esse produto já existe!");
     }
-    produtos.Add(produto);
+    ctx.Produtos.Add(produto);
+    ctx.SaveChanges();
     return Results.Created("", produto);
 });
 
 //DELETE: /api/produto/deletar/id
-app.MapPatch("/api/produto/deletar/{id}",
-    ([FromRoute] string id) =>
+app.MapDelete("/api/produto/deletar/{id}",
+    ([FromRoute] string id,
+    [FromServices] AppDataContext ctx) =>
 {
-    Produto? resultado = produtos.FirstOrDefault
-        (produtoCadastrado => produtoCadastrado.Id == id);
+    Produto? resultado = ctx.Produtos.Find(id);
     if (resultado is null)
     {
-        return Results.NotFound("Produto não encontrado!");
+        return Results.NotFound("Produto não encotrado!");
     }
-    produtos.Remove(resultado);
+    ctx.Produtos.Remove(resultado);
+    ctx.SaveChanges();
     return Results.Ok(resultado);
 });
 
-//PATCH: /api/produto/alterar/id
+//DELETE: /api/produto/alterar/id
 app.MapPatch("/api/produto/alterar/{id}",
     ([FromRoute] string id,
-    [FromBody] Produto produtoAlterado) =>
+    [FromBody] Produto produtoAlterado,
+    [FromServices] AppDataContext ctx) =>
 {
-    Produto? resultado = produtos.FirstOrDefault
-        (produtoCadastrado => produtoCadastrado.Id == id);
+    Produto? resultado = ctx.Produtos.Find(id);
     if (resultado is null)
     {
         return Results.NotFound("Produto não encontrado!");
@@ -122,8 +125,12 @@ app.MapPatch("/api/produto/alterar/{id}",
     resultado.Nome = produtoAlterado.Nome;
     resultado.Quantidade = produtoAlterado.Quantidade;
     resultado.Preco = produtoAlterado.Preco;
+    ctx.Produtos.Update(resultado);
+    ctx.SaveChanges();
     return Results.Ok(resultado);
 });
 
+
 //Implementar a remoção e atualização do produto
 app.Run();
+

@@ -1,0 +1,25 @@
+### 🧪 Testes da API de Login
+
+### 1. Verificar status da API
+GET http://localhost:5146/
+
+### 2. Listar todos os usuários cadastrados
+GET http://localhost:5146/api/usuario/listar
+
+### 3. Cadastrar novo usuário
+POST http://localhost:5146/api/usuario/cadastrar
+Content-Type: application/json
+
+{
+  "email": "teste@up.edu.br",
+  "senha": "1234"
+}
+
+### 4. Login
+POST http://localhost:5146/api/usuario/login
+Content-Type: application/json
+
+{
+  "email": "diogo1@up.edu.br",
+  "senha": "1234"
+}
