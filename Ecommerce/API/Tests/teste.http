@@ -12,7 +12,7 @@ POST http://localhost:5190/api/produto/cadastrar
 Content-Type: application/json
 
 {    
-    "nome" : "Teclado",
+    "nome" : "Teclado Gamer",
     "quantidade" : 123,
     "preco" : 57.75
 }

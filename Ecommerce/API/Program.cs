@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDataContext>();
 
-builder.Services.AddCors(
-    options => options.AddPolicy("Acesso total",
-    configs => configs
-        .AllowAnyOrigin()
-        .AllowAnyHeader()
-        .AllowAnyMethod())
+builder.Services.AddCors(options =>
+    options.AddPolicy("Acesso Total",
+        configs => configs
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod())
 );
 
 var app = builder.Build();
@@ -139,8 +139,6 @@ app.MapPatch("/api/produto/alterar/{id}",
     return Results.Ok(resultado);
 });
 
-app.UseCors("Acesso Total!");
-
-//Implementar a remoção e atualização do produto
+app.UseCors("Acesso Total");
 app.Run();
 

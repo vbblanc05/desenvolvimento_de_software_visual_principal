@@ -1,11 +1,13 @@
-import React from 'react';
-import ListarProdutos from './ListarProdutos';
+import React from "react";
+import ListarProdutos from "./components/pages/produto/ListarProduto";
 
 function App() {
   return (
-    <div id="app">
+    <div id="componente_app">
+      {/* <header>Cabeçalho</header> */}
       <h1>Minha primeira aplicação em React</h1>
-      <ListarProdutos/>
+      <ListarProdutos />
+      {/* <footer>Rodapé</footer> */}
     </div>
   );
 }
